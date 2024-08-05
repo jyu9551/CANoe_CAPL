@@ -1,0 +1,58 @@
+﻿/*@!Encoding:65001*/
+includes
+{
+  
+}
+
+variables
+{
+  message BATT_01_10ms BATT_01_10ms_msg;
+  msTimer BMS_10ms_timer;
+  msTimer Batt_Voltage_timer;
+}
+on start {
+  setTimer(BMS_10ms_timer, 10);
+//  setTimer(Batt_Voltage_timer, 10);
+}
+
+/* on sysvar */
+on sysvar_update BMS::Batt_Percent {
+  BATT_01_10ms_msg.Batt_Percent = @this;
+}
+on sysvar_update BMS::Batt_Chg_Sts {
+  BATT_01_10ms_msg.Batt_Chg_Sts = @this;
+}
+on sysvar_update BMS::Batt_Voltage {
+  BATT_01_10ms_msg.Batt_Voltage = @this*1000;
+}
+
+/* user defined function */
+
+/* on timer */
+on timer Batt_Voltage_timer {
+  if (@BMS::Batt_Chg_Sts == 1) {
+    if (@BMS::Batt_Voltage < 20.0) @BMS::Batt_Voltage += 0.001;
+    setTimer(Batt_Voltage_timer, 3);
+  }
+  else if (@BMS::Batt_Chg_Sts == 0) {
+    if (@BMS::Batt_Voltage <= 0) @BMS::Batt_Voltage = 0;
+    else if (@BMS::Batt_Voltage > 0) @BMS::Batt_Voltage -= 0.001;
+    setTimer(Batt_Voltage_timer, 10);  
+  }
+}
+on timer BMS_10ms_timer {
+  setTimer(BMS_10ms_timer, 10);
+/*
+  // Batt_Percent
+  if (@BMS::Batt_Voltage >= 14.940) @BMS::Batt_Percent = 100;
+  else if (@BMS::Batt_Voltage < 9.000) @BMS::Batt_Percent = 0;
+  else @BMS::Batt_Percent = (@BMS::Batt_Voltage - 9.000)/0.060;
+
+  // Batt_Chg_Sts
+  if (@sysvar::ENG::Ignition_sts == 1 && @BMS::Batt_Percent<80) @BMS::Batt_Chg_Sts = 1;
+  else @BMS::Batt_Chg_Sts = 0;
+  
+  // Batt_Voltage
+*/  
+  output(BATT_01_10ms_msg);
+}

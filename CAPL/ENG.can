@@ -1,0 +1,37 @@
+﻿/*@!Encoding:65001*/
+includes
+{
+  
+}
+
+variables
+{
+  message IGN_01_2ms IGN_01_2ms_msg;
+  message ENG_02_10ms ENG_02_10ms_msg;
+  msTimer IGN_2ms_timer;
+  msTimer ENG_10ms_timer;
+}
+on start{
+  setTimerCyclic(IGN_2ms_timer, 2, 2);
+  setTimerCyclic(ENG_10ms_timer, 10, 10);
+}
+
+/* on sysvar */
+on sysvar_update ENG::Ignition_sts{
+  IGN_01_2ms_msg.Ignition_sts = @this;
+}
+on sysvar_update ENG::Engine_sts{
+  ENG_02_10ms_msg.Engine_sts = @this;
+}
+
+/* user defined function */
+
+
+/* on timer */
+on timer IGN_2ms_timer{
+  output(IGN_01_2ms_msg);
+}
+
+on timer ENG_10ms_timer{
+  output(ENG_02_10ms_msg);
+}

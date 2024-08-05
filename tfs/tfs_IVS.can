@@ -1,0 +1,525 @@
+﻿/*@!Encoding:65001*/
+includes
+{
+  
+}
+
+variables
+{
+  int testcase_01_Result;
+  int testcase_02_Result;
+  int testcase_03_Result;  
+  int testcase_04_Result;  
+  int testcase_05_Result;  
+  int testcase_06_Result1; 
+  int testcase_06_Result2; 
+  int testcase_06_Result3;  
+  int testcase_07_Result;  
+  int testcase_08_Result;  
+  int testcase_09_Result;  
+}
+
+void MainTest(){
+  TC_06();
+}
+
+/* Test Case */
+testcase TC_01(){
+  message Fault_sts_Req Fault_sts_Req_msg;
+  message Fault_sts_Rsp Fault_sts_Rsp_msg;
+  int i,j = 0;
+  
+  testCaseTitle("TC 1.0.1", "Battery Percent Low / Test Case 1.0.1");
+  testCaseDescription("test case is used to check the ability of the SUT to switch");
+  testStep("1.0", "Commnunication Prepared");
+  
+  // 1. 검출
+  // Pre-Condition
+  @sysvar::ENG::Engine_sts = 1;     // Engine Run
+  @sysvar::ENG::Ignition_sts = 1;   // Ignition On  
+  // Detection Condition
+  
+  @sysvar::BMS::Batt_Percent = 10;  // Battery Percent <= 15% 
+  
+  for (i=0; i<700; i++){    
+    Fault_sts_Req_msg.All_Fault_sts_request = 1;
+    output(Fault_sts_Req_msg);
+    testWaitForMessage(Fault_sts_Rsp, 1000);
+    testWaitForTimeout(10);    
+    
+    testcase_01_Result = getSignal(BATT_Percent_Err_sts);
+    write("%d : %dms fault=%d", j, i*10, testcase_01_Result);
+    if (testcase_01_Result == 2) testStepPass("2.0", "검출");
+    else testStepFail("2.0", "검출");
+  }
+  
+  
+  // 2. 회복
+  // Pre-Condition
+  @sysvar::ENG::Engine_sts = 1;     // Engine Run
+  @sysvar::ENG::Ignition_sts = 1;   // Ignition On  
+  // Fixed Condition
+  
+  for (j=25; j<=100; j++){
+  @sysvar::BMS::Batt_Percent = j; 
+
+  for (i=1; i<=100; i++){
+    Fault_sts_Req_msg.All_Fault_sts_request = 1;
+    output(Fault_sts_Req_msg);   
+    testWaitForMessage(Fault_sts_Rsp, 1000);
+    testWaitForTimeout(10);
+
+    testcase_01_Result = getSignal(BATT_Percent_Err_sts);
+
+    write("%d : %dms fault=%d", j, i*10, testcase_01_Result);
+    if (testcase_01_Result == 1) testStepPass("2.0", "회복");
+    else testStepFail("2.0", "회복");  
+  }
+  }
+
+  // 3. 삭제
+  for (i=1; i<=50; i++){
+    @sysvar::ENG::Ignition_sts = 0;   // Ignition Off
+    testWaitForTimeout(2);
+    @sysvar::ENG::Ignition_sts = 1;   // Ignition On
+    testWaitForTimeout(2);
+  }
+  Fault_sts_Req_msg.All_Fault_sts_request = 1;
+  output(Fault_sts_Req_msg);
+  testWaitForMessage(Fault_sts_Rsp, 1000);
+  testWaitForTimeout(10);
+  testcase_01_Result = getSignal(BATT_Percent_Err_sts);
+  
+  if (testcase_01_Result == 0) testStepPass("2.0", "삭제");
+  else testStepFail("2.0", "삭제");
+}
+
+testcase TC_02(){
+  message Fault_sts_Req Fault_sts_Req_msg;
+  message Fault_sts_Rsp Fault_sts_Rsp_msg;
+  int i = 0;
+  
+  testCaseTitle("TC 1.0.2", "Battery Percent Low / Test Case 1.0.1=2");
+  testCaseDescription("test case is used to check the ability of the SUT to switch");
+  testStep("1.0", "Commnunication Prepared");
+  
+  // 1. 검출
+  // Pre-Condition
+  @sysvar::ENG::Engine_sts = 1;     // Engine Run
+  @sysvar::ENG::Ignition_sts = 1;   // Ignition On
+  @sysvar::BMS::Batt_Percent = 90;
+  // Detection Condition
+  @sysvar::BMS::Batt_Chg_Sts = 1;
+  
+  for (i=0; i<700; i++){
+    Fault_sts_Req_msg.All_Fault_sts_request = 1;
+    output(Fault_sts_Req_msg);   
+    testWaitForMessage(Fault_sts_Rsp, 1000);
+    testWaitForTimeout(10);
+
+    testcase_02_Result = getSignal(BATT_Chg_Err_sts);
+
+    write("%dms fault=%d", i*10, testcase_02_Result);
+    if (testcase_02_Result == 2) testStepPass("3.0", "검출");
+    else testStepFail("3.0", "검출");
+  }
+/*
+  // 2. 회복
+  // Pre-Condition
+  @sysvar::ENG::Engine_sts = 1;     // Engine Run
+  @sysvar::ENG::Ignition_sts = 1;   // Ignition On
+  @sysvar::BMS::Batt_Percent = 100;
+  // Fixed Condition
+  @sysvar::BMS::Batt_Chg_Sts = 0;
+
+  for (i=0; i<50; i++){
+    Fault_sts_Req_msg.All_Fault_sts_request = 1;
+    output(Fault_sts_Req_msg);
+    testWaitForMessage(Fault_sts_Rsp, 1000);
+    testWaitForTimeout(10);  
+    
+    testcase_02_Result = getSignal(BATT_Chg_Err_sts);
+
+     write("%dms fault=%d", i*10, testcase_02_Result);   
+    if (testcase_02_Result == 1) testStepPass("2.0", "회복");
+    else testStepFail("2.0", "회복");  
+  }*/
+  
+  // 3. 삭제
+  for (i=0; i<=49; i++){
+    @sysvar::ENG::Ignition_sts = 0;   // Ignition Off
+    testWaitForTimeout(2);
+    @sysvar::ENG::Ignition_sts = 1;   // Ignition On
+    testWaitForTimeout(2);
+  }
+  Fault_sts_Req_msg.All_Fault_sts_request = 1;
+  output(Fault_sts_Req_msg);
+  
+  testWaitForMessage(Fault_sts_Rsp, 1000);
+  testWaitForTimeout(10);
+  testcase_02_Result = getSignal(BATT_Chg_Err_sts);
+  
+  if (testcase_02_Result == 0) testStepPass("2.0", "삭제");
+  else testStepFail("2.0", "삭제");
+}
+
+testcase TC_03(){
+  message Fault_sts_Req Fault_sts_Req_msg;
+  message Fault_sts_Rsp Fault_sts_Rsp_msg;
+  int i;
+  double j = 0;
+  
+  testCaseTitle("TC 1.0.3", "Battery Percent Low / Test Case 1.0.1=2");
+  testCaseDescription("test case is used to check the ability of the SUT to switch");
+  testStep("1.0", "Commnunication Prepared");
+  
+  // 1. 검출
+  // Pre-Condition
+  @sysvar::ENG::Engine_sts = 1;     // Engine Run
+  @sysvar::ENG::Ignition_sts = 1;   // Ignition On
+  // Detection Condition
+    @sysvar::BMS::Batt_Voltage = 0;
+    for (i=0; i<100; i++){
+      Fault_sts_Req_msg.All_Fault_sts_request = 1;
+      output(Fault_sts_Req_msg);   
+      testWaitForMessage(Fault_sts_Rsp, 1000);
+      testWaitForTimeout(10);
+
+      testcase_03_Result = getSignal(BATT_Vol_Err_sts);
+
+      write("%.3f : %dms fault=%d", j, i*10, testcase_03_Result);
+      if (testcase_03_Result == 2) testStepPass("3.0", "검출");
+      else testStepFail("3.0", "검출");
+    }
+ // }
+/*
+  // 2. 회복
+  // Pre-Condition
+  @sysvar::ENG::Engine_sts = 1;     // Engine Run
+  @sysvar::ENG::Ignition_sts = 1;   // Ignition On
+  // Detection Condition
+  @sysvar::BMS::Batt_Voltage = 0;
+  
+  for (i=1; i<=100; i++){
+    Fault_sts_Req_msg.All_Fault_sts_request = 1;
+    output(Fault_sts_Req_msg);   
+    testWaitForMessage(Fault_sts_Rsp, 1000);
+    testWaitForTimeout(10);
+
+    testcase_03_Result = getSignal(BATT_Vol_Err_sts);
+
+    write("%dms fault=%d", i*10, testcase_03_Result);
+    if (testcase_03_Result == 1) testStepPass("2.0", "회복");
+    else testStepFail("2.0", "회복");  
+  }
+
+  */
+  // 3. 삭제
+  for (i=1; i<=49; i++){
+    @sysvar::ENG::Ignition_sts = 0;   // Ignition Off
+    testWaitForTimeout(2);
+    @sysvar::ENG::Ignition_sts = 1;   // Ignition On
+    testWaitForTimeout(2);
+  }
+  Fault_sts_Req_msg.All_Fault_sts_request = 1;
+  output(Fault_sts_Req_msg);
+  
+  testWaitForMessage(Fault_sts_Rsp, 1000);
+  testWaitForTimeout(10);
+  testcase_03_Result = getSignal(BATT_Vol_Err_sts);
+  
+  if (testcase_03_Result == 0) testStepPass("2.0", "삭제");
+  else testStepFail("2.0", "삭제");
+  
+}
+
+testcase TC_04(){
+  message Fault_sts_Req Fault_sts_Req_msg;
+  message Fault_sts_Rsp Fault_sts_Rsp_msg;
+  int i,j = 0;
+  
+  testCaseTitle("TC 1.0.2", "Battery Percent Low / Test Case 1.0.1=2");
+  testCaseDescription("test case is used to check the ability of the SUT to switch");
+  testStep("1.0", "Commnunication Prepared");
+  
+  // 1. 검출
+  // Pre-Condition
+  @sysvar::ENG::Engine_sts = 1;     // Engine Run
+  // Fixed Condition
+  @sysvar::ENG::Ignition_sts = 3;
+ 
+  for (j=40; j<=80; j++){
+  @sysvar::BMS::Batt_Percent = j; 
+  
+  for (i=0; i<500; i++){
+    Fault_sts_Req_msg.All_Fault_sts_request = 1;
+    output(Fault_sts_Req_msg);   
+    testWaitForMessage(Fault_sts_Rsp, 1000);
+    testWaitForTimeout(10);
+    
+    testcase_04_Result = getSignal(IGN_msg_Fault_sts);
+    write("%d: %dms fault=%d", j, i*10, testcase_04_Result);
+    if (testcase_04_Result == 2) testStepPass("2.0", "검출");
+    else testStepFail("2.0", "검출");
+    }
+  }
+/*
+  // 2. 회복
+  // Pre-Condition
+  @sysvar::ENG::Engine_sts = 1;     // Engine Run
+  @sysvar::ENG::Ignition_sts = 1;   // Ignition On
+  @sysvar::BMS::Batt_Percent = 90;
+  // Fixed Condition
+  @sysvar::BMS::Batt_Chg_Sts = 0;
+  
+  testWaitForTimeout(100);  
+  Fault_sts_Req_msg.All_Fault_sts_request = 1;
+  output(Fault_sts_Req_msg);
+  testWaitForTimeout(10);  
+  testWaitForMessage(Fault_sts_Rsp, 1000);
+  testWaitForTimeout(10);
+  testcase_02_Result = getSignal(BATT_Chg_Err_sts);
+
+  if (testcase_02_Result == 1) testStepPass("2.0", "회복");
+  else testStepFail("2.0", "회복");  
+  */
+  // 3. 삭제
+  for (i=0; i<49; i++){
+    @sysvar::ENG::Ignition_sts = 0;   // Ignition Off
+    testWaitForTimeout(2);
+    @sysvar::ENG::Ignition_sts = 1;   // Ignition On
+    testWaitForTimeout(2);
+  }
+  Fault_sts_Req_msg.All_Fault_sts_request = 1;
+  output(Fault_sts_Req_msg);
+  
+  testWaitForMessage(Fault_sts_Rsp, 1000);
+  testWaitForTimeout(10);
+  testcase_02_Result = getSignal(BATT_Chg_Err_sts);
+  
+  if (testcase_02_Result == 0) testStepPass("2.0", "삭제");
+  else testStepFail("2.0", "삭제");
+}
+
+testcase TC_05(){
+  message Fault_sts_Req Fault_sts_Req_msg;
+  message Fault_sts_Rsp Fault_sts_Rsp_msg;
+  int i,j = 0;
+  
+  testCaseTitle("TC 1.0.3", "Battery Percent Low / Test Case 1.0.1=2");
+  testCaseDescription("test case is used to check the ability of the SUT to switch");
+  testStep("1.0", "Commnunication Prepared");
+  
+  // 1. 검출
+  // Pre-Condition
+  @sysvar::BMS::Batt_Percent = 50;
+  @sysvar::ENG::Ignition_sts = 1;   // Ignition On
+  // Detection Condition
+  @sysvar::ENG::Engine_sts = 1;
+  
+  
+  for (i=1; i<=300; i++){
+    Fault_sts_Req_msg.All_Fault_sts_request = 1;
+    output(Fault_sts_Req_msg);   
+    testWaitForMessage(Fault_sts_Rsp, 1000);
+    testWaitForTimeout(10);
+
+    testcase_05_Result = getSignal(ENG_Err_sts);
+
+    write("%d : %dms fault=%d", j, i*10, testcase_05_Result);
+    if (testcase_05_Result == 2) testStepPass("3.0", "검출");
+    else testStepFail("3.0", "검출");
+  }
+  
+/*
+  // 2. 회복
+  // Pre-Condition
+  @sysvar::ENG::Engine_sts = 1;     // Engine Run
+  @sysvar::ENG::Ignition_sts = 1;   // Ignition On
+  @sysvar::BMS::Batt_Percent = 90;
+  // Fixed Condition
+  @sysvar::BMS::Batt_Chg_Sts = 0;
+  
+  testWaitForTimeout(100);  
+  Fault_sts_Req_msg.All_Fault_sts_request = 1;
+  output(Fault_sts_Req_msg);
+  testWaitForTimeout(10);  
+  testWaitForMessage(Fault_sts_Rsp, 1000);
+  testWaitForTimeout(10);
+  testcase_02_Result = getSignal(BATT_Chg_Err_sts);
+
+  if (testcase_02_Result == 1) testStepPass("2.0", "회복");
+  else testStepFail("2.0", "회복");  
+  */
+  // 3. 삭제
+  for (i=0; i<49; i++){
+    @sysvar::ENG::Ignition_sts = 0;   // Ignition Off
+    testWaitForTimeout(2);
+    @sysvar::ENG::Ignition_sts = 1;   // Ignition On
+    testWaitForTimeout(2);
+  }
+  Fault_sts_Req_msg.All_Fault_sts_request = 1;
+  output(Fault_sts_Req_msg);
+  
+  testWaitForMessage(Fault_sts_Rsp, 1000);
+  testWaitForTimeout(10);
+  testcase_02_Result = getSignal(BATT_Chg_Err_sts);
+  
+  if (testcase_02_Result == 0) testStepPass("2.0", "삭제");
+  else testStepFail("2.0", "삭제");
+  
+}
+
+testcase TC_06(){
+  message Fault_sts_Req Fault_sts_Req_msg;
+  message Fault_sts_Rsp Fault_sts_Rsp_msg;
+  int i,j = 0;
+  
+  testCaseTitle("TC 1.0.5", "Battery Percent Low / Test Case 1.0.5");
+  testCaseDescription("test case is used to check the ability of the SUT to switch");
+  testStep("1.0", "Commnunication Prepared");
+  
+  // 1. 검출
+  // Pre-Condition
+  @sysvar::ENG::Engine_sts = 1;
+  @sysvar::ENG::Ignition_sts = 1;   // Ignition On
+ 
+  // Detection Condition  
+//  @sysvar::BRK::Brake_press = 0x7F;
+  @sysvar::BRK::ACCEL_press = 0x7F;
+//  @sysvar::BRK::Vehicle_Speed = 255;
+    
+    for (i=1; i<=500; i++){
+      Fault_sts_Req_msg.All_Fault_sts_request = 1;
+      output(Fault_sts_Req_msg);   
+      testWaitForMessage(Fault_sts_Rsp, 1000);
+      testWaitForTimeout(10);
+
+      testcase_06_Result1 = getSignal(Brake_Err_sts);
+      testcase_06_Result2 = getSignal(ACCEL_Err_sts);
+      testcase_06_Result3 = getSignal(Speed_Err_sts);
+
+      write("value=%d %dms fault=%d %d %d", 127, i*10, testcase_06_Result1, testcase_06_Result2, testcase_06_Result3);
+      if (testcase_06_Result1 == 2) testStepPass("6.0", "검출");
+      else testStepFail("6.0", "검출");
+    }
+
+  // 2. 회복
+  // Pre-Condition
+  @sysvar::ENG::Engine_sts = 1;
+  @sysvar::ENG::Ignition_sts = 1;   // Ignition On
+  // Detection Condition
+//  @sysvar::BRK::Brake_press = 0;
+  @sysvar::BRK::ACCEL_press = 0;
+//  @sysvar::BRK::Vehicle_Speed = 0;
+  
+  for (i=1; i<=50; i++){
+    Fault_sts_Req_msg.All_Fault_sts_request = 1;
+    output(Fault_sts_Req_msg);   
+    testWaitForMessage(Fault_sts_Rsp, 1000);
+    testWaitForTimeout(10);
+
+      testcase_06_Result1 = getSignal(Brake_Err_sts);
+      testcase_06_Result2 = getSignal(ACCEL_Err_sts);
+      testcase_06_Result3 = getSignal(Speed_Err_sts);
+
+    write("%dms fault=%d %d %d", i*10, testcase_06_Result1, testcase_06_Result2, testcase_06_Result3);
+    if (testcase_06_Result1 == 1) testStepPass("2.0", "회복");
+    else testStepFail("2.0", "회복");  
+  }
+
+  
+  // 3. 삭제
+  for (i=1; i<=48; i++){
+    write("%d", i);
+    @sysvar::ENG::Ignition_sts = 0;   // Ignition Off
+    testWaitForTimeout(2);
+    @sysvar::ENG::Ignition_sts = 1;   // Ignition On
+    testWaitForTimeout(2);
+  }
+  Fault_sts_Req_msg.All_Fault_sts_request = 1;
+  output(Fault_sts_Req_msg);
+  
+  testWaitForMessage(Fault_sts_Rsp, 1000);
+  testWaitForTimeout(10);
+  testcase_06_Result3 = getSignal(Speed_Err_sts);    
+  
+  write("%dcycle, fault=%d", i-1, testcase_06_Result3);
+  if (testcase_06_Result3 == 0) testStepPass("2.0", "삭제");
+  else testStepFail("2.0", "삭제");
+
+}
+
+testcase TC_07(){
+  message Fault_sts_Req Fault_sts_Req_msg;
+  message Fault_sts_Rsp Fault_sts_Rsp_msg;
+  int i,j = 0;
+  
+  testCaseTitle("TC 1.0.3", "Battery Percent Low / Test Case 1.0.1=2");
+  testCaseDescription("test case is used to check the ability of the SUT to switch");
+  testStep("1.0", "Commnunication Prepared");
+  
+  // 1. 검출
+  // Pre-Condition
+  @sysvar::ENG::Engine_sts = 1;
+  @sysvar::ENG::Ignition_sts = 2;   // Ignition On
+  // Detection Condition
+  
+  for (j=0; j<=1; j++){
+  @sysvar::STR::Steering_angle = 721;
+  
+  for (i=1; i<=100; i++){
+    Fault_sts_Req_msg.All_Fault_sts_request = 1;
+    output(Fault_sts_Req_msg);   
+    testWaitForMessage(Fault_sts_Rsp, 1000);
+    testWaitForTimeout(10);
+
+    testcase_07_Result = getSignal(Steering_Err_sts);
+
+    write("value=%d %dms fault=%d", 720, i*10, testcase_07_Result);
+    if (testcase_07_Result == 2) testStepPass("3.0", "검출");
+    else testStepFail("3.0", "검출");
+  }
+  }
+
+  // 2. 회복
+  // Pre-Condition
+  @sysvar::ENG::Engine_sts = 1;
+  @sysvar::ENG::Ignition_sts = 3;   // Ignition On
+  // Detection Condition
+  
+  for (j=721; j<=2047; j++){
+  @sysvar::STR::Steering_angle = j;
+  
+  for (i=1; i<=100; i++){
+    Fault_sts_Req_msg.All_Fault_sts_request = 1;
+    output(Fault_sts_Req_msg);   
+    testWaitForMessage(Fault_sts_Rsp, 1000);
+    testWaitForTimeout(10);
+
+    testcase_07_Result = getSignal(Steering_Err_sts);
+
+    write("$d : %dms fault=%d", j, i*10, testcase_07_Result);
+    if (testcase_07_Result == 1) testStepPass("2.0", "회복");
+    else testStepFail("2.0", "회복");  
+  }
+  }
+  
+  // 3. 삭제
+  for (i=1; i<=50; i++){
+    @sysvar::ENG::Ignition_sts = 0;   // Ignition Off
+    testWaitForTimeout(2);
+    @sysvar::ENG::Ignition_sts = 1;   // Ignition On
+    testWaitForTimeout(2);
+  }
+  Fault_sts_Req_msg.All_Fault_sts_request = 1;
+  output(Fault_sts_Req_msg);
+  
+  testWaitForMessage(Fault_sts_Rsp, 1000);
+  testWaitForTimeout(10);
+  testcase_07_Result = getSignal(Steering_Err_sts);    
+  
+  write("%d cycle fault=%d", i-1, testcase_07_Result);
+  if (testcase_07_Result == 0) testStepPass("2.0", "삭제");
+  else testStepFail("2.0", "삭제");
+}

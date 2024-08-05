@@ -1,0 +1,67 @@
+﻿/*@!Encoding:65001*/
+includes
+{
+  
+}
+
+variables
+{
+  message BRK_01_10ms BRK_01_10ms_msg;
+  msTimer BRK_10ms_timer;
+  msTimer Vehicle_Speed_timer;
+  
+  double Brake_Speed;
+  double Accel_Speed;
+}
+on start{
+  setTimerCyclic(BRK_10ms_timer, 10, 10);
+ // setTimer(Vehicle_Speed_timer, 0);
+}
+
+/* on sysvar */
+on sysvar_update BRK::Brake_press{
+  BRK_01_10ms_msg.Brake_press = @this;
+}
+on sysvar_update BRK::ACCEL_press{
+  BRK_01_10ms_msg.ACCEL_press = @this;
+}
+on sysvar_update BRK::Vehicle_Speed{
+  BRK_01_10ms_msg.Vehicle_Speed = @this;
+}
+/* user defined function */
+
+
+/* on timer */
+on timer Vehicle_Speed_timer {
+  if (@BRK::Brake_press != 127) { 
+    if (@BRK::Brake_press > 100) @BRK::Brake_press = 100; 
+    if (@BRK::ACCEL_press > 100) @BRK::ACCEL_press = 100; 
+    
+    
+    if (@BRK::ACCEL_press == 0){
+       @BRK::Vehicle_Speed -= 2;
+      if (@BRK::Vehicle_Speed < 0) @BRK::Vehicle_Speed = 0;
+      setTimer(Vehicle_Speed_timer, 110-@BRK::Brake_press);
+    }
+    else {
+      Brake_Speed = 2/(double)(110-@BRK::Brake_press);
+      Accel_Speed = 1/((double)(101-@BRK::ACCEL_press));
+      write("B : %.8f, A : %.8f\n", Brake_Speed, Accel_Speed);
+      if (Brake_Speed > Accel_Speed){
+         @BRK::Vehicle_Speed -= 2;
+         if (@BRK::Vehicle_Speed < 0) @BRK::Vehicle_Speed = 0;
+         setTimer(Vehicle_Speed_timer, 1/(Brake_Speed - Accel_Speed));
+      }
+      else if (Brake_Speed < Accel_Speed) {
+        @BRK::Vehicle_Speed++;
+        if (@BRK::Vehicle_Speed > 254) @BRK::Vehicle_Speed = 254;  
+        setTimer(Vehicle_Speed_timer, 1/(Accel_Speed - Brake_Speed)); 
+      }
+      else setTimer(Vehicle_Speed_timer, 10);
+    }
+  }
+}
+
+on timer BRK_10ms_timer{
+  output(BRK_01_10ms_msg);
+}

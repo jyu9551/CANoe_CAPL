@@ -1,0 +1,41 @@
+;CANoe Version |4|17|0|58229 Test Environment 
+Version: 17.3.91 Build 91
+32 PRO
+5
+APPDIR Vector.CANoe.SignalGenerators.DLL
+Vector.CANoe.SignalGenerators, Version=17.3.91.0, Culture=neutral, PublicKeyToken=null
+Vector.CANoe.SignalGenerators.ComponentWrapper
+1
+1.0.1
+VTSPersistentRoot 1 Begin_Of_Object
+1
+1
+TS_PERSISTENT_ROOT_ID_STRING_0x792341fe
+1
+1
+VTSFolder 2 Begin_Of_Object
+1
+VTSItem 3 Begin_Of_Object
+1
+3 3309540637 0
+1
+END_OF_ITEM_DATA
+End_Of_Object VTSItem 3
+4
+IVS_Automation
+0
+<VFileName V9 QL> 1 "..\Configuration\CAN_500kBaud_1ch\report.xml" 
+END_OF_FILE_NAME
+<VFileName V9 QL> 1 "" 
+END_OF_FILE_NAME
+0
+1
+END_OF_FOLDER_DATA
+End_Of_Object VTSFolder 2
+1
+3309540637
+1
+1
+3309540637
+0
+End_Of_Object VTSPersistentRoot 1

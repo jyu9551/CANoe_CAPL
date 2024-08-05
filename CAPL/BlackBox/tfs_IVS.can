@@ -1,0 +1,33 @@
+﻿/*@!Encoding:65001*/
+includes
+{
+  
+}
+
+variables
+{
+  
+}
+
+void MainTest(){
+  testcase_1();
+  testcase_2();  
+}
+
+testcase testcase_1(){
+  TestCaseTitle("TC 1.0.1", "IVS BlackBox Test Case 1.0.1");
+  
+  TestCaseDescription("Test case is used to check the ability");
+  TestStep("1.0", "Communication prepared");
+  
+  if (testWaitForMessage(IVS_01_10ms, @sysvar::IVS::IVS_01_10ms_period)) {
+    TestStepPass("2.0", "Request");
+  }
+  else testStepFail("2.0", "Request");
+  
+  
+}
+testcase testcase_2(){
+  
+  
+}

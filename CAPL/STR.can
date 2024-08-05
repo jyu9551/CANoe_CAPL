@@ -1,0 +1,30 @@
+﻿/*@!Encoding:65001*/
+includes
+{
+  
+}
+
+variables
+{
+  message STR_01_10ms STR_01_10ms_msg;
+  msTimer STR_10ms_timer;
+}
+on start{
+  setTimerCyclic(STR_10ms_timer, 10, 10);
+}
+
+/* on sysvar */
+on sysvar_update STR::Steering_angle{
+  STR_01_10ms_msg.Steering_angle = @this;
+}
+
+/* user defined function */
+
+
+/* on timer */
+on timer STR_10ms_timer{
+//  if (@STR::Steering_angle > 720) @STR::Steering_angle = 720;
+//  else if (@STR::Steering_angle < -720) @STR::Steering_angle = -720;
+  
+  output(STR_01_10ms_msg);
+}
