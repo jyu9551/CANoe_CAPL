@@ -2,15 +2,21 @@
 
 ## 프로젝트 소개
 1.	ECU의 진단 통신 관련 요구사양서를 분석하여 동적 검증 및 자동화하는 프로젝트<br><br>
+<p align="center">
 <img src="https://github.com/user-attachments/assets/2503c11f-3592-4982-8f9e-f5237755e49a" width="65%" height="65%"> <br><br>
+</p>
 
 ## Vector CANoe 기반 Architecture
+<p align="center">
 <img src="https://github.com/user-attachments/assets/f625a4a2-7732-46b2-8526-c1c35b48c7ce" width="79%" height="79%"><br><br>
+</p>
 
+## 1️⃣ 요구사양서 분석
+<p align="center">
+<img src="https://github.com/user-attachments/assets/1ea4cb4d-460d-44f4-9114-0820257a6b23" width="60%" height="60%"><br>
+<img src="https://github.com/user-attachments/assets/598501e6-cc2f-427d-8cd3-2f507685d2c8" width="90%" height="90%"><br>
+</p>
 
-## 1️⃣ Global Path Planning
-Global Path Planning을 위한 경로 탐색 알고리즘 비교 후 A star 알고리즘 적용<br><br>
-<img src="https://github.com/user-attachments/assets/fb25a0ac-b8d4-413f-bd17-0048b65ffc73" width="40%" height="40%">
 
 ## 2️⃣ Driving
 <table>
