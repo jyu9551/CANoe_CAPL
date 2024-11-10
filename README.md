@@ -3,7 +3,7 @@
 ## 프로젝트 소개
 ECU의 진단 통신 관련 요구사양서를 분석하여 동적 검증 및 자동화하는 프로젝트<br><br>
 <p align="center">
-<img src="https://github.com/user-attachments/assets/2503c11f-3592-4982-8f9e-f5237755e49a" width="65%" height="65%"> <br><br>
+<img src="https://github.com/user-attachments/assets/3cd04851-f821-469b-9cbf-0320b65b17c1" width="65%" height="65%"> <br><br>
 </p>
 
 ## Vector CANoe 기반 Architecture
