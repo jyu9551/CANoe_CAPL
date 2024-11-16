@@ -10,7 +10,7 @@ ECU의 진단 통신 관련 요구사양서를 분석하여 동적 검증 및 �
 <p align="center">
 <img src="https://github.com/user-attachments/assets/f625a4a2-7732-46b2-8526-c1c35b48c7ce" width="79%" height="79%"><br>
 </p>
-전체 진행 과정  1)요구사양서 분석 2)검증 환경 구축 3)Test Case 개발 4)자동화 스크립트 개발 및 테스트 5)검증 결과 보고<br>
+전체 진행 과정  1)요구사양서 분석 2)검증 환경 구축 3)Test Case 개발 4)자동화 스크립트 개발 및 테스트 5)검증 결과 보고<br><br>
 
 ## 1️⃣ 요구사양서 분석
 <p align="center">
