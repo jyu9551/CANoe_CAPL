@@ -48,8 +48,14 @@ ECU의 진단 통신 관련 요구사양서를 분석하여 동적 검증 및 �
 </table>
 
 ## 3️⃣ Test Case 개발
+<p align="center">
+<img src="https://github.com/user-attachments/assets/10fa1e1f-bc9c-474f-996f-7fb8809168b5" width="70%" height="70%">
+</p>
 
-## 4️⃣ CAPL 자동화 스크립트 개발
+## 4️⃣ CAPL 자동화 스크립트 개발 및 테스트
+<p align="center">
+<img src="https://github.com/user-attachments/assets/d25a0851-051d-42b1-a674-4033b1b4c45f" width="45%" height="45%">
+</p>
 
 ## 5️⃣ 검증 결과 보고
 <p align="center">
